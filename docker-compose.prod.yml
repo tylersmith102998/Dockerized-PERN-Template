@@ -1,0 +1,43 @@
+services:
+    web:
+        build:
+            context: .
+            dockerfile: ./apps/web/Dockerfile.prod
+        ports:
+            - "80:80"
+        depends_on:
+            - api
+
+    api:
+        build:
+            context: .
+            dockerfile: ./apps/api/Dockerfile.prod
+        ports:
+            - "3000:3000"
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+        depends_on:
+            db:
+                condition: service_healthy
+        # volumes:
+        #     - temp_vol:/repo
+
+    db:
+        image: postgres:18
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - "5432:5432"
+        volumes:
+            - db_data:/var/lib/postgresql
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
+            interval: 5s
+            timeout: 2s
+            retries: 20
+
+volumes:
+    db_data:
+    # temp_vol:

@@ -1,0 +1,17 @@
+#1. Build api source 
+FROM node:24-slim as builder 
+
+WORKDIR /repo
+
+COPY package*.json ./
+COPY apps/api/package*.json ./apps/api/
+COPY packages/shared/package*.json ./packages/shared/
+
+RUN npm install
+
+COPY apps/api ./apps/api
+COPY packages/shared ./packages/shared
+
+WORKDIR /repo/apps/api
+
+CMD ["sh", "-c", "npm run deploy"]

@@ -1,0 +1,18 @@
+FROM node:24-slim 
+
+WORKDIR /repo 
+
+COPY package*.json ./
+COPY apps/api/package*.json ./apps/api/
+COPY packages/shared/package*.json ./packages/shared/
+
+RUN npm install 
+
+COPY apps/api ./apps/api
+COPY packages/shared ./packages/shared
+
+WORKDIR /repo/apps/api
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "npm run db:deploy && npm run dev"]
